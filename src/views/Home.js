@@ -154,7 +154,7 @@ class Home extends React.Component {
               scale={this.state.log ? {y: 'log'} : null}
               domain={{x: domain, y: range}}
               standalone={false}
-              style={{...styles.line, data: {stroke: '#fafafa50', strokeWidth: 3}}}
+              style={{...styles.line, data: {stroke: '#fafafa75', strokeWidth: 1, strokeDasharray: '4, 3' }}}
               y={(d) => {
                 let r = (Math.log(2) / this.state.daysToDouble)
                 let y = daysSinceNthCase * (Math.exp(1) ** (r * d.x))
