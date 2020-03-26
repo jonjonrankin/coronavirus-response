@@ -39,7 +39,7 @@ class Home extends React.Component {
   }
 
   componentWillUnmount () {
-    window.removeEventListener('resize')
+    window.removeEventListener('resize', () => null)
   }
 
   onlyUnique (value, index, self) { 
@@ -100,7 +100,7 @@ class Home extends React.Component {
       combinedData = combinedData.concat(g.data)
     })
 
-    let size = this.state.windowWidth < 800 ? {w: 400, h: 400} : {w: 650, h: 400}
+    let size = this.state.windowWidth < 1000 ? {w: 400, h: 400} : {w: 650, h: 460}
     if (combinedData.length > 1) {
       let domain = [
         Math.min.apply(Math, combinedData.map(d => d.x)),
@@ -320,6 +320,15 @@ class Home extends React.Component {
           {this.renderCountrySearch()}
         </div>
         <div className='slider-container'>
+          <h4>Scale</h4>
+          <form>
+            <input type='radio' checked={!this.state.log} onChange={this.toggleLog} />
+            <label style={{marginRight: '8px'}} onClick={this.toggleLog}>Linear</label>
+            <input type='radio' checked={this.state.log} onChange={this.toggleLog} />
+            <label onClick={this.toggleLog}>Logarithmic</label>
+          </form>
+        </div>
+        <div className='slider-container'>
           <h4>Reference line</h4>
           <p>Cases double every {this.state.daysToDouble} days</p>
           <div className='combined-countries-slider'>
@@ -343,12 +352,6 @@ class Home extends React.Component {
   renderContent () {
     return (
       <div>
-        <form>
-          <label onClick={this.toggleLog}>Linear</label>
-          <input style={{marginRight: '8px'}} type='radio' checked={!this.state.log} onChange={this.toggleLog} />
-          <label onClick={this.toggleLog}>Logarithmic</label>
-          <input type='radio' checked={this.state.log} onChange={this.toggleLog} />
-        </form>
         <div className='combined-countries-graph'>
           {this.renderControlPanel()}
           {this.renderCombinedCountries(this.state.selectedCountries)}
