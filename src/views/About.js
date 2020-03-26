@@ -12,9 +12,13 @@ export default function About () {
         <a href='https://www.nytimes.com/interactive/2020/03/21/upshot/coronavirus-deaths-by-country.html'>visualizations</a><span> </span>
         out there depicting the unfolding COVID-19 pandemic, I thought 
         the internet could use a more customizable, interactive
-        one. I hope users are able to derive their own insights 
-        from this data set, and more fully grasp the gravity of 
-        this global health crisis.
+        one. 
+        This is not intended to be the fasted-updated or most 
+        comprehensive dashboard for keeping up with the numbers. 
+        My hope is that you are able to derive your own 
+        insights from these visualizations of this data, and 
+        thereby more fully grasp the gravity of this global 
+        health crisis.
       </p>
       <small><FaGithub /> <a href='https://github.com/jonjonrankin/coronavirus-response'>Collaborate</a> with me on GitHub - <FaHeart /> <a href='https://github.com/jonjonrankin/'>jonjonrankin</a></small>
     </div>

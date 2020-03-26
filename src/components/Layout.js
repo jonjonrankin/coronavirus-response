@@ -7,8 +7,9 @@ class Layout extends React.Component {
       <div className='layout'>
         <header>
           <h1>
-            coronavirus response
+            COVID LENS
           </h1>
+          <div className='subtitle'>explore global coronavirus data</div>
           <div className='nav'>
             <Link to='/'>Compare Countries</Link>
             <Link to='/about'>About</Link>
