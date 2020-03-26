@@ -15,7 +15,7 @@ class Home extends React.Component {
       daysToDouble: 3,
       daysSinceNthCase: 100,
       countries: [],
-      selectedCountries: ["Italy", "US", "Iran", "Korea, South", "United Kingdom"],
+      selectedCountries: ["Italy", "US", "Iran", "Korea, South", "India"],
       query: '',
       maxCases: null,
       windowWidth: window.innerWidth
