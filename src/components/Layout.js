@@ -12,6 +12,7 @@ class Layout extends React.Component {
           <div className='subtitle'>explore global coronavirus data</div>
           <div className='nav'>
             <Link to='/'>Compare Countries</Link>
+            <Link to='/global'>Global Cases</Link>
             <Link to='/about'>About</Link>
           </div>
         </header>
