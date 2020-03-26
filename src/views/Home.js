@@ -17,7 +17,8 @@ class Home extends React.Component {
       countries: [],
       selectedCountries: ["Italy", "US", "Iran", "Korea, South", "United Kingdom"],
       query: '',
-      maxCases: null
+      maxCases: null,
+      windowWidth: window.innerWidth
     }
 
     this.inputRef = React.createRef()
