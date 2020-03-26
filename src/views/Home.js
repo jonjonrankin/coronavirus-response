@@ -32,6 +32,14 @@ class Home extends React.Component {
       skipEmptyLines: true,
       chunk: false
     })
+
+    window.addEventListener('resize', (e) => {
+      this.setState({windowWidth: e.target.innerWidth})
+    })
+  }
+
+  componentWillUnmount () {
+    window.removeEventListener('resize')
   }
 
   onlyUnique (value, index, self) { 
@@ -92,6 +100,7 @@ class Home extends React.Component {
       combinedData = combinedData.concat(g.data)
     })
 
+    let size = this.state.windowWidth < 800 ? {w: 400, h: 400} : {w: 650, h: 400}
     if (combinedData.length > 1) {
       let domain = [
         Math.min.apply(Math, combinedData.map(d => d.x)),
@@ -101,7 +110,6 @@ class Home extends React.Component {
         daysSinceNthCase,
         Math.max.apply(Math, combinedData.map(d => d.y)) + Math.max.apply(Math, combinedData.map(d => d.y)) * (this.state.log ? 5 : 0.33)
       ]
-      let size = {w: 650, h: 400}
       return (
         <div style={{margin: '1rem', maxWidth: '100vw', flexGrow: '1'}}>
           <svg style={styles.parent} viewBox={`0 0 ${size.w} ${size.h}`}>
@@ -157,7 +165,6 @@ class Home extends React.Component {
         </div>
       )
     } else {
-      let size = {w: 650, h: 400}
       let domain = [
         0,
         50
