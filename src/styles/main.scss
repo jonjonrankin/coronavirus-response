@@ -1,3 +1,6 @@
+@import 'combined-countries-graph.scss';
+@import 'home.scss';
+
 .App {
   text-align: center;
 }
@@ -34,5 +37,39 @@
   }
   to {
     transform: rotate(360deg);
+  }
+}
+
+html {
+  body {
+    font-family: monospace, sans-serif;
+    background-color: rgba(0,0,0,0.8);
+    color: #fafafa;
+  }
+
+  input {
+    background-color: rgba(255,255,255,0.1);
+    color: #fafafa;
+    border-radius: 3px;
+    padding: 8px;
+    box-sizing: border-box;
+  }
+
+  p, a, div {
+    font-size: 14px;
+    color: #fafafa;
+  }
+
+  .layout {
+    max-width: 1200px;
+    margin: 0 auto;
+
+    header {
+      margin: 1rem 0;
+    }
+  
+    footer {
+      margin: 1rem 0;
+    }
   }
 }
