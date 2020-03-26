@@ -6,7 +6,7 @@ While there are <a href='https://www.vox.com/policy-and-politics/2020/3/13/21178
 
 ## Contributing to COVID LENS
 
-Right now, this project is powered by me 👋. I welcome the contributions of any social isolators bored out of their minds.
+Right now, this project is powered by me 👋. I welcome the contributions of any social isolators bored out of their minds. For those curious, COVID LENS is bootstrapped with `create-react-app` and utilizes [Formidable Labs' Victory](https://formidable.com/open-source/victory/) charting library in conjunction with data from the United Nations Office for the Coordination of Humanitarian Affairs, compiled [here](https://data.humdata.org/dataset/novel-coronavirus-2019-ncov-cases).
 
 <table>
   <tr>
