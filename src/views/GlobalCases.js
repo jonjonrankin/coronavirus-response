@@ -1,9 +1,9 @@
 import React from 'react'
-import Papa from 'papaparse'
 import moment from 'moment'
 import { VictoryLine, VictoryAxis } from 'victory'
 import Slider from '../components/Slider'
 import { getStyles, stringToColor } from '../styles/graph-styles'
+import { getGlobalData } from '../requests/data'
 
 class GlobalCases extends React.Component {
   constructor (props) {
@@ -11,28 +11,28 @@ class GlobalCases extends React.Component {
 
     this.state = {
       cases: null,
+      casesMinusChina: null,
       log: false,
       daysToDouble: 4,
       daysSinceNthCase: 10,
-      countries: [],
       maxCases: null,
       windowWidth: window.innerWidth,
-      china: false
+      china: false,
+      loading: true
     }
 
     this.inputRef = React.createRef()
+
+    getGlobalData().then(r => {
+      this.setState({
+        cases: r.globalData,
+        casesMinusChina: r.globalDataMinusChina,
+        loading: false
+      })
+    })
   }
 
   componentDidMount () {
-    var csvFilePath = require('../assets/time_series_covid19_confirmed_global.csv')
-    Papa.parse(csvFilePath, {
-      complete: (r) => this.handleData(r),
-      header: true,
-      download: true,
-      skipEmptyLines: true,
-      chunk: false
-    })
-
     window.addEventListener('resize', (e) => {
       this.setState({windowWidth: e.target.innerWidth})
     })
@@ -46,31 +46,15 @@ class GlobalCases extends React.Component {
     return self.indexOf(value) === index
   }
 
-  handleData (r) {
-    let countries = r.data.map(d => d['Country/Region']).filter(this.onlyUnique)
-    this.setState({cases: r.data, countries})
-  }
-
-  renderChart (c) {
+  renderChart () {
     let daysSinceNthCase = this.state.daysSinceNthCase
     let styles = getStyles()
-    let cases = this.state.china ? this.state.cases : this.state.cases.filter(co => co['Country/Region'] !== 'China')
+    let cases = this.state.china ? this.state.cases : this.state.casesMinusChina
   
     let d = []
     cases.forEach(c => {
-      Object.keys(c).forEach(day => {
-        if (!['Province/State','Country/Region','Lat','Long'].includes(day)) {
-          let x = parseInt(moment(day).format('x'))
-          let datum = d.find(d => d.x === x)
-
-          if (datum !== undefined) {
-            datum.y += parseInt(c[day])
-          } else {
-            datum = {x: x, y: parseInt(c[day])}
-            d.push(datum)
-          }
-        }
-      })
+      let datum = {x: parseInt(moment(c.date).format('x')), y: c.count}
+      d.push(datum)
     })
 
     d = d.filter(datum => datum.y > this.state.daysSinceNthCase)
@@ -325,10 +309,10 @@ class GlobalCases extends React.Component {
   }
   
   render () {
-    if (this.state.cases) {
-      return this.renderContent()
-    } else {
+    if (this.state.loading) {
       return <div>...</div>
+    } else {
+      return this.renderContent()
     }
   }
 }
