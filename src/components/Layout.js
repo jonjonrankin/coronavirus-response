@@ -18,7 +18,7 @@ class Layout extends React.Component {
           </div>
         </header>
         {this.props.children}
-        <footer><a href='https://github.com/jonjonrankin/coronavirus-response'><FaGithub /></a><span>|</span><a href={'https://data.humdata.org/dataset/novel-coronavirus-2019-ncov-cases'}>Source data</a><span>|</span><small>last updated: 03/26/2020 2:09:17UTC</small></footer>
+        <footer><a href='https://github.com/jonjonrankin/coronavirus-response'><FaGithub /></a><span>|</span><a href={'https://data.humdata.org/dataset/novel-coronavirus-2019-ncov-cases'}>Source data</a></footer>
       </div>
     )
   }
