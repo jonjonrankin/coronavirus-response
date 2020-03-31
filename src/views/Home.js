@@ -1,9 +1,9 @@
 import React from 'react'
-import Papa from 'papaparse'
 import moment from 'moment'
 import { VictoryLine, VictoryAxis, VictoryLabel } from 'victory'
 import Slider from '../components/Slider'
 import { getStyles, stringToColor } from '../styles/graph-styles'
+import { postVisit, getData, getCountries } from '../requests/data'
 
 class Home extends React.Component {
   constructor (props) {
@@ -18,22 +18,23 @@ class Home extends React.Component {
       selectedCountries: ["Italy", "US", "Iran", "Korea, South", "India"],
       query: '',
       maxCases: null,
-      windowWidth: window.innerWidth
+      windowWidth: window.innerWidth,
+      loading: true,
+      data: null
     }
 
     this.inputRef = React.createRef()
+
+    postVisit()
+    getData(this.state.selectedCountries).then(data => {
+      this.setState({loading: false, data})
+      getCountries().then(data => {
+        this.setState({countries: data})
+      })
+    })
   }
 
   componentDidMount () {
-    var csvFilePath = require('../assets/time_series_covid19_confirmed_global.csv')
-    Papa.parse(csvFilePath, {
-      complete: (r) => this.handleData(r),
-      header: true,
-      download: true,
-      skipEmptyLines: true,
-      chunk: false
-    })
-
     window.addEventListener('resize', (e) => {
       this.setState({windowWidth: e.target.innerWidth})
     })
@@ -43,44 +44,33 @@ class Home extends React.Component {
     window.removeEventListener('resize', () => null)
   }
 
+  updateCountries (co) {
+    let selectedCountries = this.state.selectedCountries
+    selectedCountries.push(co)
+    getData(selectedCountries).then(r => {
+      this.setState({
+        data: r,
+        query: '',
+        selectedCountries
+      })
+    })
+  }
+
   onlyUnique (value, index, self) { 
     return self.indexOf(value) === index
   }
 
-  handleData (r) {
-    let countries = r.data.map(d => d['Country/Region']).filter(this.onlyUnique)
-    this.setState({cases: r.data, countries})
-  }
-
-  renderCombinedCountries (c) {
-    let countries
+  renderCombinedCountries () {
+    let usableCountries = this.state.selectedCountries
     let daysSinceNthCase = this.state.daysSinceNthCase
-    if (c) {
-      countries = c.slice()
-    }
     let styles = getStyles()
-    let cases = this.state.cases
-    let countryCases = cases.filter(c => countries.includes(c['Country/Region']))
-    let usableCountries = countries
-  
+
     let groupedData = []
-    countries.forEach(co => {
-      let coCases = countryCases.filter(c => c['Country/Region'] === co)
+    this.state.data.forEach(co => {
       let d = []
       let data
-      coCases.forEach(c => {
-        Object.keys(c).forEach(day => {
-          if (!['Province/State','Country/Region','Lat','Long'].includes(day)) {
-            let datum = d.find(d => d.x === moment(day).format('x'))
-
-            if (datum) {
-              datum.y += parseInt(c[day])
-            } else {
-              datum = {x: moment(day).format('x'), y: parseInt(c[day])}
-              d.push(datum)
-            }
-          }
-        })
+      co.cases.forEach(c => {
+        d.push({x: parseInt(moment(c.date).format('x')), y: c.count})
       })
 
       let daysSinceNthCase = this.state.daysSinceNthCase
@@ -88,11 +78,11 @@ class Home extends React.Component {
       data = d.filter(d => d.y >= daysSinceNthCase)
       if (data.length > 1) {
         groupedData.push({
-          country: co,
+          country: co.country,
           data: data.map(d => { return {x: moment(d.x, 'x').diff(moment(Math.min.apply(Math, data.map(d => d.x)), 'x'), 'days'), y: d.y} })
         })
       } else {
-        usableCountries = usableCountries.filter(c => c !== co)
+        usableCountries = usableCountries.filter(c => c !== co.country)
       }
     })
 
@@ -135,7 +125,7 @@ class Home extends React.Component {
             {usableCountries.map(co => {
               let d = groupedData.find(d => d.country === co).data
               return (
-                <g key={countries.indexOf(co)}>
+                <g key={usableCountries.indexOf(co)}>
                   <VictoryLine
                     width={size.w} height={size.h}
                     scale={this.state.log ? {y: 'log'} : null}
@@ -237,9 +227,7 @@ class Home extends React.Component {
           {countries.map(co => {
             return (
               <div style={{color: stringToColor(co)}} className='select-dropdown-option' key={countries.indexOf(co)} onClick={() => {
-                let selectedCountries = this.state.selectedCountries
-                selectedCountries.push(co)
-                this.setState({selectedCountries, query: ''})
+                this.updateCountries(co)
               }}>{co}</div>
             )
           })}
@@ -362,10 +350,10 @@ class Home extends React.Component {
   }
   
   render () {
-    if (this.state.cases) {
-      return this.renderContent()
-    } else {
+    if (this.state.loading) {
       return <div>...</div>
+    } else {
+      return this.renderContent()
     }
   }
 }
