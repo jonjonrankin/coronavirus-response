@@ -26,12 +26,14 @@ class Home extends React.Component {
     this.inputRef = React.createRef()
 
     postVisit()
-    getData(this.state.selectedCountries).then(data => {
-      this.setState({loading: false, data})
-      getCountries().then(data => {
-        this.setState({countries: data})
+    getData(this.state.selectedCountries)
+      .then(data => {
+        this.setState({loading: false, data})
+        getCountries().then(data => {
+          this.setState({countries: data})
+        })
       })
-    })
+      .catch(e => console.log(e))
   }
 
   componentDidMount () {
