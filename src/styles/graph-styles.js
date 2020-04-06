@@ -27,12 +27,12 @@ export const getStyles = () => {
           }
         }
       },
-      axis: { stroke: COLOR, strokeWidth: 2 },
+      axis: { stroke: COLOR, strokeWidth: 1 },
       ticks: { strokeWidth: 0 },
       tickLabels: {
         fill: GRAY_COLOR,
         fontFamily: 'inherit',
-        fontSize: '12px',
+        fontSize: '10px',
         angle: 30
       },
       axisLabel: {
@@ -41,10 +41,11 @@ export const getStyles = () => {
         fill: GRAY_COLOR
       }
     },
+
     label: {
       fill: GRAY_COLOR,
       fontFamily: 'inherit',
-      fontSize: '14px'
+      fontSize: '10px'
     },
 
     // AXIS LABEL
@@ -56,7 +57,7 @@ export const getStyles = () => {
 
     // LINE DEFAULT
     line: {
-      data: { stroke: COLOR, strokeWidth: 2 },
+      data: { stroke: COLOR, strokeWidth: 1 },
       label: {
         fill: GRAY_COLOR,
         fontFamily: 'inherit',
@@ -74,89 +75,9 @@ export const getStyles = () => {
       colorScale: [COLOR_50, COLOR_75, COLOR]
     },
 
-    // PIE DEFAULT
-    pie: {
-      colorScale: [COLOR, COLOR_75, COLOR_50, GRAY_COLOR_25],
-      labelTitleOne: {
-        fill: COLOR,
-        fontSize: 20,
-        fontFamily: 'inherit',
-        fontWeight: 600
-      },
-      labelTitleTwo: {
-        fill: COLOR_75,
-        fontSize: 20,
-        fontFamily: 'inherit',
-        fontWeight: 600
-      },
-      labelTitleThree: {
-        fill: COLOR_50,
-        fontSize: 20,
-        fontFamily: 'inherit',
-        fontWeight: 600
-      },
-      labelTitleFour: {
-        fill: GRAY_COLOR_25,
-        fontSize: 20,
-        fontFamily: 'inherit',
-        fontWeight: 600
-      },
-      labelTitleOneSubtitle: {
-        fill: GRAY_COLOR,
-        fontSize: 14,
-        fontFamily: 'inherit',
-        fontWeight: 300
-      },
-      labelTitleTwoSubtitle: {
-        fill: GRAY_COLOR,
-        fontSize: 14,
-        fontFamily: 'inherit',
-        fontWeight: 300
-      },
-      labelTitleThreeSubtitle: {
-        fill: GRAY_COLOR,
-        fontSize: 14,
-        fontFamily: 'inherit',
-        fontWeight: 300
-      },
-      labelTitleFourSubtitle: {
-        fill: GRAY_COLOR,
-        fontSize: 14,
-        fontFamily: 'inherit',
-        fontWeight: 300
-      }
-    },
-
     // SCATTER
     scatter: {
       data: { stroke: COLOR, strokeWidth: 2, fill: '#ffffff' }
-    },
-
-    // BAR
-    bar: {
-      data: { fill: COLOR }
-    },
-
-    // VERTICAL TODAY LINE
-    todayLine: {
-      front: {
-        data: { stroke: GRAY_COLOR_75, strokeWidth: 2 }
-      },
-      back: {
-        data: { stroke: GRAY_COLOR_25, strokeWidth: 6 }
-      },
-      dot: {
-        data: { stroke: GRAY_COLOR_50, strokeWidth: 5, fill: GRAY_COLOR }
-      }
-    },
-
-    // FLYOUT
-    flyout: {
-      strokeWidth: '1px',
-      stroke: GRAY_COLOR_75,
-      fontFamily: '"Calibre", sans-serif',
-      fill: 'white',
-      padding: 0
     },
 
     // ANIMATION

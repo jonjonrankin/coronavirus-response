@@ -8,7 +8,6 @@ import {
 import Home from './views/Home'
 import Layout from './components/Layout'
 import About from './views/About'
-import GlobalCases from './views/GlobalCases'
 
 export default function Routes() {
   return (
@@ -20,9 +19,6 @@ export default function Routes() {
           </Route>
           <Route path="/about">
             <About />
-          </Route>
-          <Route path="/global">
-            <GlobalCases />
           </Route>
         </Switch>
       </Layout>

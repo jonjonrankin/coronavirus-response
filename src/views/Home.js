@@ -1,9 +1,7 @@
 import React from 'react'
-import moment from 'moment'
-import { VictoryLine, VictoryAxis, VictoryLabel } from 'victory'
 import Slider from '../components/Slider'
-import { getStyles, stringToColor } from '../styles/graph-styles'
-import { postVisit, getData, getCountries } from '../requests/data'
+import { stringToColor } from '../styles/graph-styles'
+import { getData, getCountries } from '../requests/data'
 import CasesTimeSeries from '../components/Charts/CasesTimeSeries'
 import { ordinalSuffixOf } from '../utils.js'
 
@@ -13,7 +11,6 @@ class Home extends React.Component {
 
     this.state = {
       cases: null,
-      log: true,
       daysToDouble: 3,
       daysSinceNthCase: 100,
       countries: [],
@@ -27,12 +24,9 @@ class Home extends React.Component {
 
     this.inputRef = React.createRef()
 
-    getData(this.state.selectedCountries)
+    getData()
       .then(data => {
-        this.setState({loading: false, data})
-        getCountries().then(data => {
-          this.setState({countries: data})
-        })
+        this.setState({loading: false, data: data.groupedData, countries: data.countries})
       })
       .catch(e => console.log(e))
   }
@@ -50,34 +44,23 @@ class Home extends React.Component {
   updateCountries (co) {
     let selectedCountries = this.state.selectedCountries
     selectedCountries.push(co)
-    getData(selectedCountries).then(r => {
-      this.setState({
-        data: r,
-        query: '',
-        selectedCountries
-      })
+    this.setState({
+      query: '',
+      selectedCountries
     })
   }
 
-  onlyUnique (value, index, self) { 
-    return self.indexOf(value) === index
-  }
-
-  renderCombinedCountriesChart () {
+  renderCombinedCountriesChart (log) {
     return (
       <CasesTimeSeries
         data={this.state.data}
         selectedCountries={this.state.selectedCountries}
         daysSinceNthCase={this.state.daysSinceNthCase}
         windowWidth={this.state.windowWidth}
-        log={this.state.log}
+        log={log}
         daysToDouble={this.state.daysToDouble}
       />
     )
-  }
-
-  toggleLog = () => {
-    this.setState({log: !this.state.log})
   }
 
   renderSelectedCountry (country) {
@@ -113,8 +96,7 @@ class Home extends React.Component {
     return (
       <div className='search'>
         <div style={{postition: 'relative'}}>
-          <h4>Search for countries</h4>
-          <input ref={this.inputRef} value={this.state.query} onChange={(e) => this.setState({query: e.target.value})} />
+          <input ref={this.inputRef} placeholder='search for a country' value={this.state.query} onChange={(e) => this.setState({query: e.target.value})} />
           {this.renderDropdown()}
         </div>
         <div className='selected-countries'>
@@ -167,17 +149,9 @@ class Home extends React.Component {
   renderControlPanel () {
     return (
       <div className='control-panel'>
+        <h2>control panel</h2>
         <div className='search-container'>
           {this.renderCountrySearch()}
-        </div>
-        <div className='slider-container'>
-          <h4>Scale</h4>
-          <form>
-            <input type='radio' checked={!this.state.log} onChange={this.toggleLog} />
-            <label style={{marginRight: '8px'}} onClick={this.toggleLog}>Linear</label>
-            <input type='radio' checked={this.state.log} onChange={this.toggleLog} />
-            <label onClick={this.toggleLog}>Logarithmic</label>
-          </form>
         </div>
         <div className='slider-container'>
           <h4>Reference line</h4>
@@ -202,11 +176,27 @@ class Home extends React.Component {
 
   renderContent () {
     return (
-      <div>
-        <div className='combined-countries-graph'>
+      <div className='home'>
+        <div className='control-panel-container'>
           {this.renderControlPanel()}
-          <div className='graphs-container'>
-            {this.renderCombinedCountriesChart()}
+        </div>
+        <div className='graphs-container'>
+          <h1>The big picture</h1>
+          <p>
+            Making sense of the coronavirus numbers you hear in the media can be a challenge. 
+            COVID LENS helps you explore the data to see the trends that matter to you. 
+            These charts illustrate the how rapidly COVID-19 cases are growing in the countries you've selected in the control panel.
+          </p>
+          <br /><br />
+          <h2>Growth in cases since the {ordinalSuffixOf(this.state.daysSinceNthCase)} case</h2>
+          <p>This chart shows how rapidly the COVID-19 disease has spread since each country's {ordinalSuffixOf(this.state.daysSinceNthCase)}</p>
+          <div className='combined-countries-graph'>
+            {this.renderCombinedCountriesChart(false)}
+          </div>
+          <h2>Growth in cases since the {ordinalSuffixOf(this.state.daysSinceNthCase)} case</h2>
+          <p>This is the same chart on a logarithmic scale. A straight line on a logarithmic scale represents exponential growth. Adjust the reference line on the control panel to see how the logarithmic scale distorts the data.</p>
+          <div className='combined-countries-graph'>
+            {this.renderCombinedCountriesChart(true)}
           </div>
         </div>
       </div>
@@ -215,7 +205,7 @@ class Home extends React.Component {
   
   render () {
     if (this.state.loading) {
-      return <div>...</div>
+      return <div style={{textAlign: 'center'}}>...</div>
     } else {
       return this.renderContent()
     }

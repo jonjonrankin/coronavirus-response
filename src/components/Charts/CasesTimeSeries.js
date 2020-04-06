@@ -10,7 +10,7 @@ class CasesTimeSeries extends React.Component {
     let styles = getStyles()
 
     let groupedData = []
-    data.forEach(co => {
+    data.filter(co => selectedCountries.includes(co.country)).forEach(co => {
       let d = []
       let data
       co.cases.forEach(c => {
@@ -62,7 +62,6 @@ class CasesTimeSeries extends React.Component {
               tickFormat={d => d}
               style={styles.axis}
               width={size.w} height={size.h}
-              label={'Days since ' + (ordinalSuffixOf(daysSinceNthCase)) + ' case'}
             />
             {usableCountries.map(co => {
               let d = groupedData.find(d => d.country === co).data
@@ -125,7 +124,6 @@ class CasesTimeSeries extends React.Component {
               tickFormat={d => d}
               style={styles.axis}
               width={size.w} height={size.h}
-              label={'Days since ' + (ordinalSuffixOf(daysSinceNthCase)) + ' case'}
             />
             <VictoryLine
               width={size.w} height={size.h}

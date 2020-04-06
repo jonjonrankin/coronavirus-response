@@ -1,10 +1,8 @@
+@import '_mixins.scss';
+
 @import 'combined-countries-graph.scss';
 @import 'home.scss';
 @import 'about.scss';
-
-.App {
-  text-align: center;
-}
 
 .App-logo {
   height: 40vmin;
@@ -57,8 +55,12 @@ html {
     box-sizing: border-box;
   }
 
-  p, a, div {
+  h4 {
     font-size: 14px;
+  }
+
+  p, a, div {
+    font-size: 12px;
     color: #fafafa;
   }
 
@@ -69,32 +71,27 @@ html {
     justify-content: space-between;
 
     header {
+      text-align: center;
       background-color: #ffffff15;
       border-bottom: 1px solid black;
       padding: 1rem 0;
 
-      h1 {
-        font-size: 24px;
-      }
+      a {
+        text-decoration: none;
 
-      .subtitle {
-        margin: 0 0 4px 0;
-        font-style: italic;
-      }
-
-      .nav {
-        display: flex;
-        flex-direction: row;
-        justify-content: center;
-        align-items: flex-end;
-
-        > * {
-          margin: 0 8px;
+        .header-title {
+          font-size: 24px;
+        }
+  
+        .subtitle {
+          margin: 0 0 4px 0;
+          font-style: italic;
         }
       }
     }
   
     footer {
+      text-align: center;
       background-color: #ffffff15;
       border-top: 1px solid black;
       padding: 1rem 0;
@@ -109,7 +106,7 @@ html {
 
     main {
       width: 100%;
-      max-width: 1200px;
+      max-width: 1400px;
       margin: 0 auto;
     }
   }
