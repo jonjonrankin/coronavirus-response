@@ -1,9 +1,62 @@
-import React from 'react'
+import React, {useState, useRef} from 'react'
 import Slider from '../components/Slider'
 import { stringToColor } from '../styles/graph-styles'
 import { getData, getCountries } from '../requests/data'
 import CasesTimeSeries from '../components/Charts/CasesTimeSeries'
+import NewCasesDaily from '../components/Charts/NewCasesDaily'
 import { ordinalSuffixOf } from '../utils.js'
+import NewCasesVsTotalCases from '../components/Charts/NewCasesVsTotalCases'
+
+const Search = (props) => {
+  const [query, setQuery] = useState('')
+  const inputRef = useRef(null)
+
+  const updateCountries = (c, bool) => {
+    setQuery('')
+    props.updateCountries(c, bool)
+  }
+
+  const renderDropdown = () => {
+    if (query !== '') {
+      let countries = props.countries.filter(co => co.toLowerCase().includes(query.toLowerCase()))
+      return (
+        <div className='select-dropdown' style={{position: 'absolute', border: '1px solid black', width: inputRef.current.offsetWidth + 'px'}}>
+          {countries.map(co => {
+            return (
+              <div style={{color: stringToColor(co)}} className='select-dropdown-option' key={countries.indexOf(co)} onClick={() => {
+                updateCountries(co, true)
+              }}>{co}</div>
+            )
+          })}
+        </div>
+      )
+    }
+  }
+
+  const renderSelectedCountry = (country) => {
+    return (
+      <p><span onClick={() => updateCountries(country, false)} className='exit'>x</span><b style={{color: stringToColor(country)}}>{country}</b></p>
+    )
+  }
+
+  return (
+    <div className='search'>
+      <div style={{postition: 'relative'}}>
+        <input ref={inputRef} placeholder='search for a country' value={query} onChange={(e) => setQuery(e.target.value)} />
+        {renderDropdown()}
+      </div>
+      <div className='selected-countries'>
+        {props.selectedCountries.map(co => {
+          return (
+            <div className='selected-country' key={props.selectedCountries.indexOf(co)}>
+              {renderSelectedCountry(co)}
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
 
 class Home extends React.Component {
   constructor (props) {
@@ -11,10 +64,10 @@ class Home extends React.Component {
 
     this.state = {
       cases: null,
-      daysToDouble: 3,
+      daysToDouble: 4,
       daysSinceNthCase: 100,
       countries: [],
-      selectedCountries: ["Italy", "US", "Iran", "Korea, South", "India"],
+      selectedCountries: ["US", "Italy", "Japan", "India", "Canada"],
       query: '',
       maxCases: null,
       windowWidth: window.innerWidth,
@@ -41,9 +94,14 @@ class Home extends React.Component {
     window.removeEventListener('resize', () => null)
   }
 
-  updateCountries (co) {
+  updateCountries (co, bool) {
+    console.log(co)
     let selectedCountries = this.state.selectedCountries
-    selectedCountries.push(co)
+    if (bool) {
+      selectedCountries.push(co)
+    } else {
+      selectedCountries = selectedCountries.filter(c => c !== co)
+    }
     this.setState({
       query: '',
       selectedCountries
@@ -62,53 +120,24 @@ class Home extends React.Component {
       />
     )
   }
-
-  renderSelectedCountry (country) {
+  
+  renderDailyIncreaseGraph () {
     return (
-      <p><span onClick={() => {
-        let selectedCountries = this.state.selectedCountries
-        if (selectedCountries.length > 1) {
-          selectedCountries.splice(selectedCountries.indexOf(country), 1)
-        }
-        this.setState({selectedCountries})
-      }} className='exit'>x</span><b style={{color: stringToColor(country)}}>{country}</b></p>
+      this.state.selectedCountries.map(c => {
+        return (
+          <NewCasesDaily daysToDouble={this.state.daysToDouble} key={this.state.selectedCountries.indexOf(c)} data={this.state.data.find(d => d.country === c)} daysSinceNthCase={this.state.daysSinceNthCase} windowWidth={this.state.windowWidth}/>
+        )
+      })
     )
   }
 
-  renderDropdown () {
-    if (this.state.query !== '') {
-      let countries = this.state.countries.filter(co => co.toLowerCase().includes(this.state.query.toLowerCase()))
-      return (
-        <div className='select-dropdown' style={{position: 'absolute', border: '1px solid black', width: this.inputRef.current.offsetWidth + 'px'}}>
-          {countries.map(co => {
-            return (
-              <div style={{color: stringToColor(co)}} className='select-dropdown-option' key={countries.indexOf(co)} onClick={() => {
-                this.updateCountries(co)
-              }}>{co}</div>
-            )
-          })}
-        </div>
-      )
-    }
-  }
-
-  renderCountrySearch () {
+  renderNewCasesVsTotalCases () {
     return (
-      <div className='search'>
-        <div style={{postition: 'relative'}}>
-          <input ref={this.inputRef} placeholder='search for a country' value={this.state.query} onChange={(e) => this.setState({query: e.target.value})} />
-          {this.renderDropdown()}
-        </div>
-        <div className='selected-countries'>
-          {this.state.selectedCountries.map(co => {
-            return (
-              <div className='selected-country' key={this.state.selectedCountries.indexOf(co)}>
-                {this.renderSelectedCountry(co)}
-              </div>
-            )
-          })}
-        </div>
-      </div>
+      this.state.selectedCountries.map(c => {
+        return (
+          <NewCasesVsTotalCases daysToDouble={this.state.daysToDouble} key={this.state.selectedCountries.indexOf(c)} data={this.state.data.find(d => d.country === c)} daysSinceNthCase={this.state.daysSinceNthCase} windowWidth={this.state.windowWidth}/>
+        )
+      })
     )
   }
 
@@ -151,7 +180,7 @@ class Home extends React.Component {
       <div className='control-panel'>
         <h2>control panel</h2>
         <div className='search-container'>
-          {this.renderCountrySearch()}
+          <Search countries={this.state.countries} selectedCountries={this.state.selectedCountries} updateCountries={(c, bool) => this.updateCountries(c, bool)} />
         </div>
         <div className='slider-container'>
           <h4>Reference line</h4>
@@ -181,6 +210,7 @@ class Home extends React.Component {
           {this.renderControlPanel()}
         </div>
         <div className='graphs-container'>
+          {console.log('rendering graphs')}
           <h1>The big picture</h1>
           <p>
             Making sense of the coronavirus numbers you hear in the media can be a challenge. 
@@ -189,7 +219,10 @@ class Home extends React.Component {
           </p>
           <br /><br />
           <h2>Growth in cases since the {ordinalSuffixOf(this.state.daysSinceNthCase)} case</h2>
-          <p>This chart shows how rapidly the COVID-19 disease has spread since each country's {ordinalSuffixOf(this.state.daysSinceNthCase)}</p>
+          <p>
+            This chart shows how rapidly the COVID-19 disease has spread since each country's {ordinalSuffixOf(this.state.daysSinceNthCase)} case. 
+            You can adjust the start date in the control panel.
+          </p>
           <div className='combined-countries-graph'>
             {this.renderCombinedCountriesChart(false)}
           </div>
@@ -198,6 +231,21 @@ class Home extends React.Component {
           <div className='combined-countries-graph'>
             {this.renderCombinedCountriesChart(true)}
           </div>
+          <h1>How do we know if things are getting better?</h1>
+          <p>
+            Accelerating growth in cases only ends when the number of new cases each day starts to stall or decrease. 
+            Some countries have already made progress on this front, while others still struggle with growing daily increases.
+          </p>
+          <div className='daily-increase-graphs'>
+            {this.renderDailyIncreaseGraph()}
+          </div>
+          {/* <p>
+            Uncontrolled growth in cases can only be avoided if the number of new cases each day starts to decrease. 
+            Some countries have already made progress on this front, while others still struggle with growing daily increases.
+          </p>
+          <div className='new-cases-vs-total-cases-graphs'>
+            {this.renderNewCasesVsTotalCases()}
+          </div> */}
         </div>
       </div>
     )

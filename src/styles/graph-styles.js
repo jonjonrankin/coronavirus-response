@@ -42,6 +42,23 @@ export const getStyles = () => {
       }
     },
 
+    axisNoGrid: {
+      grid: null,
+      axis: { stroke: COLOR, strokeWidth: 0 },
+      ticks: { strokeWidth: 0 },
+      tickLabels: {
+        fill: GRAY_COLOR,
+        fontFamily: 'inherit',
+        fontSize: '10px',
+        angle: 30
+      },
+      axisLabel: {
+        fontFamily: 'inherit',
+        fontSize: '14px',
+        fill: GRAY_COLOR
+      }
+    },
+
     label: {
       fill: GRAY_COLOR,
       fontFamily: 'inherit',
@@ -78,6 +95,22 @@ export const getStyles = () => {
     // SCATTER
     scatter: {
       data: { stroke: COLOR, strokeWidth: 2, fill: '#ffffff' }
+    },
+
+    // BAR
+    bar: {
+      data: { stroke: COLOR, strokeWidth: 2, fill: '#ffffff' },
+      labels: {
+        fill: 'rgba(0, 0, 0, 0.8)',
+        fontFamily: 'inherit',
+        fontSize: '24px'
+      }
+    },
+
+    flyout: {
+      stroke: '#fafafa',
+      strokeWidth: 1,
+      fill: '#fafafa'
     },
 
     // ANIMATION

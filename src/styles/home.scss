@@ -118,9 +118,41 @@
       width: auto;
     }
 
-    svg {
+    .combined-countries-graph {
       margin-top: -2rem;
+    }
+
+    svg {
       margin-bottom: 1rem;
+    }
+
+    .daily-increase-graphs {
+      display: flex;
+      flex-flow: row wrap;
+      justify-content: flex-start;
+      margin: 4rem 0 2rem 0;
+
+      > div {
+        box-sizing: border-box;
+        margin: 0;
+        flex: 1;
+        flex-basis: 33%;
+        flex-grow: 0;
+      }
+    }
+
+    .new-cases-vs-total-cases-graphs {
+      display: flex;
+      flex-flow: row wrap;
+      justify-content: flex-start;
+
+      > div {
+        box-sizing: border-box;
+        margin: 0;
+        flex: 1;
+        flex-basis: 50%;
+        flex-grow: 0;
+      }
     }
   }
 }
