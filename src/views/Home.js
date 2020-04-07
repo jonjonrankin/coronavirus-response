@@ -1,9 +1,62 @@
-import React from 'react'
-import moment from 'moment'
-import { VictoryLine, VictoryAxis, VictoryLabel } from 'victory'
+import React, {useState, useRef} from 'react'
 import Slider from '../components/Slider'
-import { getStyles, stringToColor } from '../styles/graph-styles'
-import { postVisit, getData, getCountries } from '../requests/data'
+import { stringToColor } from '../styles/graph-styles'
+import { getData, getCountries } from '../requests/data'
+import CasesTimeSeries from '../components/Charts/CasesTimeSeries'
+import NewCasesDaily from '../components/Charts/NewCasesDaily'
+import { ordinalSuffixOf } from '../utils.js'
+import NewCasesVsTotalCases from '../components/Charts/NewCasesVsTotalCases'
+
+const Search = (props) => {
+  const [query, setQuery] = useState('')
+  const inputRef = useRef(null)
+
+  const updateCountries = (c, bool) => {
+    setQuery('')
+    props.updateCountries(c, bool)
+  }
+
+  const renderDropdown = () => {
+    if (query !== '') {
+      let countries = props.countries.filter(co => co.toLowerCase().includes(query.toLowerCase()))
+      return (
+        <div className='select-dropdown' style={{position: 'absolute', border: '1px solid black', width: inputRef.current.offsetWidth + 'px'}}>
+          {countries.map(co => {
+            return (
+              <div style={{color: stringToColor(co)}} className='select-dropdown-option' key={countries.indexOf(co)} onClick={() => {
+                updateCountries(co, true)
+              }}>{co}</div>
+            )
+          })}
+        </div>
+      )
+    }
+  }
+
+  const renderSelectedCountry = (country) => {
+    return (
+      <p><span onClick={() => updateCountries(country, false)} className='exit'>x</span><b style={{color: stringToColor(country)}}>{country}</b></p>
+    )
+  }
+
+  return (
+    <div className='search'>
+      <div style={{postition: 'relative'}}>
+        <input ref={inputRef} placeholder='search for a country' value={query} onChange={(e) => setQuery(e.target.value)} />
+        {renderDropdown()}
+      </div>
+      <div className='selected-countries'>
+        {props.selectedCountries.map(co => {
+          return (
+            <div className='selected-country' key={props.selectedCountries.indexOf(co)}>
+              {renderSelectedCountry(co)}
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
 
 class Home extends React.Component {
   constructor (props) {
@@ -11,11 +64,10 @@ class Home extends React.Component {
 
     this.state = {
       cases: null,
-      log: true,
-      daysToDouble: 3,
+      daysToDouble: 4,
       daysSinceNthCase: 100,
       countries: [],
-      selectedCountries: ["Italy", "US", "Iran", "Korea, South", "India"],
+      selectedCountries: ["US", "Italy", "Japan", "India", "Canada"],
       query: '',
       maxCases: null,
       windowWidth: window.innerWidth,
@@ -25,13 +77,9 @@ class Home extends React.Component {
 
     this.inputRef = React.createRef()
 
-    postVisit()
-    getData(this.state.selectedCountries)
+    getData()
       .then(data => {
-        this.setState({loading: false, data})
-        getCountries().then(data => {
-          this.setState({countries: data})
-        })
+        this.setState({loading: false, data: data.groupedData, countries: data.countries})
       })
       .catch(e => console.log(e))
   }
@@ -46,232 +94,55 @@ class Home extends React.Component {
     window.removeEventListener('resize', () => null)
   }
 
-  updateCountries (co) {
+  updateCountries (co, bool) {
+    console.log(co)
     let selectedCountries = this.state.selectedCountries
-    selectedCountries.push(co)
-    getData(selectedCountries).then(r => {
-      this.setState({
-        data: r,
-        query: '',
-        selectedCountries
-      })
-    })
-  }
-
-  onlyUnique (value, index, self) { 
-    return self.indexOf(value) === index
-  }
-
-  renderCombinedCountries () {
-    let usableCountries = this.state.selectedCountries
-    let daysSinceNthCase = this.state.daysSinceNthCase
-    let styles = getStyles()
-
-    let groupedData = []
-    this.state.data.forEach(co => {
-      let d = []
-      let data
-      co.cases.forEach(c => {
-        d.push({x: parseInt(moment(c.date).format('x')), y: c.count})
-      })
-
-      let daysSinceNthCase = this.state.daysSinceNthCase
-
-      data = d.filter(d => d.y >= daysSinceNthCase)
-      if (data.length > 1) {
-        groupedData.push({
-          country: co.country,
-          data: data.map(d => { return {x: moment(d.x, 'x').diff(moment(Math.min.apply(Math, data.map(d => d.x)), 'x'), 'days'), y: d.y} })
-        })
-      } else {
-        usableCountries = usableCountries.filter(c => c !== co.country)
-      }
-    })
-
-    let combinedData = []
-    groupedData.forEach(g => {
-      combinedData = combinedData.concat(g.data)
-    })
-
-    let size = this.state.windowWidth < 1000 ? {w: 400, h: 400} : {w: 650, h: 460}
-    if (combinedData.length > 1) {
-      let domain = [
-        Math.min.apply(Math, combinedData.map(d => d.x)),
-        Math.max.apply(Math, combinedData.map(d => d.x)) + Math.max.apply(Math, combinedData.map(d => d.x)) * 0.25
-      ]
-      let range = [
-        daysSinceNthCase,
-        Math.max.apply(Math, combinedData.map(d => d.y)) + Math.max.apply(Math, combinedData.map(d => d.y)) * (this.state.log ? 5 : 0.33)
-      ]
-      return (
-        <div style={{margin: '1rem', maxWidth: '100vw', flexGrow: '1'}}>
-          <svg style={styles.parent} viewBox={`0 0 ${size.w} ${size.h}`}>
-            <VictoryAxis
-              dependentAxis
-              domain={range}
-              standalone={false}
-              scale={this.state.log ? 'log' : null}
-              tickFormat={d => parseInt(d)}
-              tickCount={6}
-              style={styles.axis}
-              width={size.w} height={size.h}
-            />
-            <VictoryAxis
-              domain={domain}
-              standalone={false}
-              tickFormat={d => d}
-              style={styles.axis}
-              width={size.w} height={size.h}
-              label={'Days since ' + (this.ordinalSuffixOf(daysSinceNthCase)) + ' case'}
-            />
-            {usableCountries.map(co => {
-              let d = groupedData.find(d => d.country === co).data
-              return (
-                <g key={usableCountries.indexOf(co)}>
-                  <VictoryLine
-                    width={size.w} height={size.h}
-                    scale={this.state.log ? {y: 'log'} : null}
-                    domain={{x: domain, y: range}}
-                    standalone={false}
-                    data={d}
-                    style={{...styles.line, data: {stroke: stringToColor(co)}}}
-                    labels={(datum) => datum.datum.x === Math.max.apply(Math, d.map(d => d.x)) ? co : ''}
-                    labelComponent={<VictoryLabel style={{...styles.label, fill: stringToColor(co)}} />}
-                    interpolation='monotoneX'
-                  />
-                </g>
-              )
-            })}
-            <VictoryLine
-              width={size.w} height={size.h}
-              scale={this.state.log ? {y: 'log'} : null}
-              domain={{x: domain, y: range}}
-              standalone={false}
-              style={{...styles.line, data: {stroke: '#fafafa75', strokeWidth: 1, strokeDasharray: '4, 3' }}}
-              y={(d) => {
-                let r = (Math.log(2) / this.state.daysToDouble)
-                let y = daysSinceNthCase * (Math.exp(1) ** (r * d.x))
-                return y
-              }}
-            />
-          </svg>
-        </div>
-      )
+    if (bool) {
+      selectedCountries.push(co)
     } else {
-      let domain = [
-        0,
-        50
-      ]
-      let range = [
-        daysSinceNthCase,
-        10001
-      ]
-      return (
-        <div style={{margin: '1rem', maxWidth: '100vw', flexGrow: '1'}}>
-          <svg style={styles.parent} viewBox={`0 0 ${size.w} ${size.h}`}>
-            <VictoryAxis
-              dependentAxis
-              domain={range}
-              standalone={false}
-              scale={this.state.log ? 'log' : null}
-              tickFormat={d => parseInt(d)}
-              tickCount={6}
-              style={styles.axis}
-              width={size.w} height={size.h}
-            />
-            <VictoryAxis
-              domain={domain}
-              standalone={false}
-              tickFormat={d => d}
-              style={styles.axis}
-              width={size.w} height={size.h}
-              label={'Days since ' + (this.ordinalSuffixOf(daysSinceNthCase)) + ' case'}
-            />
-            <VictoryLine
-              width={size.w} height={size.h}
-              scale={this.state.log ? {y: 'log'} : null}
-              domain={{x: domain, y: range}}
-              standalone={false}
-              style={{...styles.line, data: {stroke: '#fafafa50', strokeWidth: 3}}}
-              y={(d) => {
-                let r = (Math.log(2) / this.state.daysToDouble)
-                let y = daysSinceNthCase * (Math.exp(1) ** (r * d.x))
-                return y
-              }}
-            />
-          </svg>
-        </div>
-      )
+      selectedCountries = selectedCountries.filter(c => c !== co)
     }
+    this.setState({
+      query: '',
+      selectedCountries
+    })
   }
 
-  toggleLog = () => {
-    this.setState({log: !this.state.log})
-  }
-
-  renderSelectedCountry (country) {
+  renderCombinedCountriesChart (log) {
     return (
-      <p><span onClick={() => {
-        let selectedCountries = this.state.selectedCountries
-        if (selectedCountries.length > 1) {
-          selectedCountries.splice(selectedCountries.indexOf(country), 1)
-        }
-        this.setState({selectedCountries})
-      }} className='exit'>x</span><b style={{color: stringToColor(country)}}>{country}</b></p>
+      <CasesTimeSeries
+        data={this.state.data}
+        selectedCountries={this.state.selectedCountries}
+        daysSinceNthCase={this.state.daysSinceNthCase}
+        windowWidth={this.state.windowWidth}
+        log={log}
+        daysToDouble={this.state.daysToDouble}
+      />
+    )
+  }
+  
+  renderDailyIncreaseGraph () {
+    return (
+      this.state.selectedCountries.map(c => {
+        return (
+          <NewCasesDaily daysToDouble={this.state.daysToDouble} key={this.state.selectedCountries.indexOf(c)} data={this.state.data.find(d => d.country === c)} daysSinceNthCase={this.state.daysSinceNthCase} windowWidth={this.state.windowWidth}/>
+        )
+      })
     )
   }
 
-  renderDropdown () {
-    if (this.state.query !== '') {
-      let countries = this.state.countries.filter(co => co.toLowerCase().includes(this.state.query.toLowerCase()))
-      return (
-        <div className='select-dropdown' style={{position: 'absolute', border: '1px solid black', width: this.inputRef.current.offsetWidth + 'px'}}>
-          {countries.map(co => {
-            return (
-              <div style={{color: stringToColor(co)}} className='select-dropdown-option' key={countries.indexOf(co)} onClick={() => {
-                this.updateCountries(co)
-              }}>{co}</div>
-            )
-          })}
-        </div>
-      )
-    }
-  }
-
-  renderCountrySearch () {
+  renderNewCasesVsTotalCases () {
     return (
-      <div className='search'>
-        <div style={{postition: 'relative'}}>
-          <h4>Search for countries</h4>
-          <input ref={this.inputRef} value={this.state.query} onChange={(e) => this.setState({query: e.target.value})} />
-          {this.renderDropdown()}
-        </div>
-        <div className='selected-countries'>
-          {this.state.selectedCountries.map(co => {
-            return (
-              <div className='selected-country' key={this.state.selectedCountries.indexOf(co)}>
-                {this.renderSelectedCountry(co)}
-              </div>
-            )
-          })}
-        </div>
-      </div>
+      this.state.selectedCountries.map(c => {
+        return (
+          <NewCasesVsTotalCases daysToDouble={this.state.daysToDouble} key={this.state.selectedCountries.indexOf(c)} data={this.state.data.find(d => d.country === c)} daysSinceNthCase={this.state.daysSinceNthCase} windowWidth={this.state.windowWidth}/>
+        )
+      })
     )
   }
 
   ordinalSuffixOf (i) {
-    var j = i % 10,
-        k = i % 100;
-    if (j === 1 && k !== 11) {
-        return i + "st";
-    }
-    if (j === 2 && k !== 12) {
-        return i + "nd";
-    }
-    if (j === 3 && k !== 13) {
-        return i + "rd";
-    }
-    return i + "th";
+    return ordinalSuffixOf(i)
   }
 
   logSlider (value) {
@@ -307,17 +178,9 @@ class Home extends React.Component {
   renderControlPanel () {
     return (
       <div className='control-panel'>
+        <h2>control panel</h2>
         <div className='search-container'>
-          {this.renderCountrySearch()}
-        </div>
-        <div className='slider-container'>
-          <h4>Scale</h4>
-          <form>
-            <input type='radio' checked={!this.state.log} onChange={this.toggleLog} />
-            <label style={{marginRight: '8px'}} onClick={this.toggleLog}>Linear</label>
-            <input type='radio' checked={this.state.log} onChange={this.toggleLog} />
-            <label onClick={this.toggleLog}>Logarithmic</label>
-          </form>
+          <Search countries={this.state.countries} selectedCountries={this.state.selectedCountries} updateCountries={(c, bool) => this.updateCountries(c, bool)} />
         </div>
         <div className='slider-container'>
           <h4>Reference line</h4>
@@ -342,10 +205,47 @@ class Home extends React.Component {
 
   renderContent () {
     return (
-      <div>
-        <div className='combined-countries-graph'>
+      <div className='home'>
+        <div className='control-panel-container'>
           {this.renderControlPanel()}
-          {this.renderCombinedCountries(this.state.selectedCountries)}
+        </div>
+        <div className='graphs-container'>
+          {console.log('rendering graphs')}
+          <h1>The big picture</h1>
+          <p>
+            Making sense of the coronavirus numbers you hear in the media can be a challenge. 
+            COVID LENS helps you explore the data to see the trends that matter to you. 
+            These charts illustrate the how rapidly COVID-19 cases are growing in the countries you've selected in the control panel.
+          </p>
+          <br /><br />
+          <h2>Growth in cases since the {ordinalSuffixOf(this.state.daysSinceNthCase)} case</h2>
+          <p>
+            This chart shows how rapidly the COVID-19 disease has spread since each country's {ordinalSuffixOf(this.state.daysSinceNthCase)} case. 
+            You can adjust the start date in the control panel.
+          </p>
+          <div className='combined-countries-graph'>
+            {this.renderCombinedCountriesChart(false)}
+          </div>
+          <h2>Growth in cases since the {ordinalSuffixOf(this.state.daysSinceNthCase)} case</h2>
+          <p>This is the same chart on a logarithmic scale. A straight line on a logarithmic scale represents exponential growth. Adjust the reference line on the control panel to see how the logarithmic scale distorts the data.</p>
+          <div className='combined-countries-graph'>
+            {this.renderCombinedCountriesChart(true)}
+          </div>
+          <h1>How do we know if things are getting better?</h1>
+          <p>
+            Accelerating growth in cases only ends when the number of new cases each day starts to stall or decrease. 
+            Some countries have already made progress on this front, while others still struggle with growing daily increases.
+          </p>
+          <div className='daily-increase-graphs'>
+            {this.renderDailyIncreaseGraph()}
+          </div>
+          {/* <p>
+            Uncontrolled growth in cases can only be avoided if the number of new cases each day starts to decrease. 
+            Some countries have already made progress on this front, while others still struggle with growing daily increases.
+          </p>
+          <div className='new-cases-vs-total-cases-graphs'>
+            {this.renderNewCasesVsTotalCases()}
+          </div> */}
         </div>
       </div>
     )
@@ -353,7 +253,7 @@ class Home extends React.Component {
   
   render () {
     if (this.state.loading) {
-      return <div>...</div>
+      return <div style={{textAlign: 'center'}}>...</div>
     } else {
       return this.renderContent()
     }

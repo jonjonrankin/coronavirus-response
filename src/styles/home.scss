@@ -1,3 +1,158 @@
-h1 {
-  margin: 0;
+.home {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  flex-wrap: wrap-reverse;
+  align-items: center;
+
+  @include sm {
+    flex-direction: column;
+  }
+
+  h1 {
+    margin: 0;
+  }
+
+  .control-panel-container {
+    margin-right: 2rem;
+    width: calc(300px - 2rem);
+    @include sm {
+      margin-right: 0;
+      width: 100%;
+    }
+
+    .control-panel {
+      border: 1px solid black;
+      border-radius: 3px;
+      margin: 1rem;
+      padding: 1rem;
+      background-color: #ffffff10;
+  
+      p {
+        margin: 0;
+      }
+  
+      h4 {
+        margin: 4px 0;
+      }
+  
+  
+      .search-container {
+        margin: 1rem 0;
+        .search {
+          input {
+            width: 100%;
+          }
+          .select-dropdown {
+            cursor: pointer;
+            max-height: 300px;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.8);
+          
+            .select-dropdown-option {
+              padding: 6px 0;
+              &:hover {
+                background-color: rgba(0,0,0,0.03);
+              }
+            }
+          }
+  
+          .selected-countries {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            justify-content: flex-start;
+            cursor: default;
+            margin: 1rem -0.5rem 0 -0.5rem;
+  
+            .selected-country {
+              border: 1px solid black;
+              background-color: rgba(0,0,0,0.2);
+              border-radius: 3px;
+              margin: 0.5rem;
+              padding: 0.5rem;
+  
+              b {
+                font-size: 12px;
+              }
+  
+              span {
+                margin-right: 6px;
+                cursor: pointer;
+                font-weight: 800;
+              }
+            }
+          }
+        }
+      }
+  
+      .slider-container {
+        margin: 1rem 0;
+
+        .slider {
+          width: 100%;
+        }
+      }
+    } 
+  }
+
+  .graphs-container {
+    p, h1, h2 {
+      margin: 0.25rem;
+      text-align: left;
+    }
+
+    padding-top: 2rem;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    // width: 100%;
+    height: calc(100vh - 163px);
+    width: calc(100% - 300px);
+    max-width: 800px;
+    overflow: auto;
+
+    @include sm {
+      height: auto;
+      margin: 0 0.25rem;
+      width: auto;
+    }
+
+    .combined-countries-graph {
+      margin-top: -2rem;
+    }
+
+    svg {
+      margin-bottom: 1rem;
+    }
+
+    .daily-increase-graphs {
+      display: flex;
+      flex-flow: row wrap;
+      justify-content: flex-start;
+      margin: 4rem 0 2rem 0;
+
+      > div {
+        box-sizing: border-box;
+        margin: 0;
+        flex: 1;
+        flex-basis: 33%;
+        flex-grow: 0;
+      }
+    }
+
+    .new-cases-vs-total-cases-graphs {
+      display: flex;
+      flex-flow: row wrap;
+      justify-content: flex-start;
+
+      > div {
+        box-sizing: border-box;
+        margin: 0;
+        flex: 1;
+        flex-basis: 50%;
+        flex-grow: 0;
+      }
+    }
+  }
 }
