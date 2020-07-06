@@ -1,0 +1,120 @@
+.states-pop-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+
+  h1 {
+    justify-content: center;
+    margin: 6rem 0 0 0;
+  }
+
+  .states-pop {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    min-height: 700px;
+    max-width: 1200px;
+    margin: 0 auto;
+
+    @media only screen and (max-width: 800px) {
+      min-height: 0;
+      flex-direction: column-reverse;
+    }
+  
+    .map-wrapper {
+      flex-grow: 1;
+      width: 100%;
+      height: 100%;
+      max-width: 800px;
+  
+      .title {
+        text-align: center;
+      }
+  
+      .content {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+  
+  
+      .legend {
+        display: flex;
+  
+        .col {
+          display: flex;
+          flex-direction: column;
+          padding: 0 4px;
+  
+          div {
+            width: 25px;
+            height: 25px;
+          }
+        }
+      }
+  
+      .map {
+        flex-grow: 1;
+        width: 100%;
+        height: 100%;
+      }
+      }
+    }
+  
+    .us-detail {
+      margin-left: 1rem;
+      width: 30%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+  
+      td {
+        padding: 1rem;
+      }
+
+      @media only screen and (max-width: 800px) {
+        width: 100%;
+        margin: 0;
+      }
+
+      .states-pop-cases {
+        display: flex;
+        flex-flow: row wrap;
+        margin: 1rem;
+        // width: 280px;
+
+        div {
+          width: 3.33%;
+          height: 5px;
+          margin: 1px;
+
+          &.positive {
+            background-color: red;
+          }
+
+          &.negative {
+            background-color: white;
+          }
+        }
+      }
+    }
+  
+    .rsm-geography {
+      outline: none !important;
+      transform: scale(1);
+      transition: all 300ms;
+      cursor: pointer;
+  
+      &.hot {
+        transform: translate(0, -8px);
+        transition: all 300ms;
+        box-shadow: 4px 8px 30px rgba(0,0,0,0.5);
+      }
+    }
+  }
+}

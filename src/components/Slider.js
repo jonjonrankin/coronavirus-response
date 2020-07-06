@@ -14,7 +14,7 @@ const Slider = ({
   return (
     <input
       type='range'
-      className='slider'
+      className='slider range'
       min={min}
       max={max}
       value={sliderValue}

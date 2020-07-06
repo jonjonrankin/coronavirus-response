@@ -6,19 +6,9 @@ export default function About () {
     <div className='about'>
       <h1>About</h1>
       <p>
-        While there are<span> </span>
-        <a href='https://www.vox.com/policy-and-politics/2020/3/13/21178289/confirmed-coronavirus-cases-us-countries-italy-iran-singapore-hong-kong'>many</a><span> </span>
-        <a href='https://ourworldindata.org/grapher/covid-confirmed-cases-since-100th-case?time=56'>excellent</a><span> </span>
-        <a href='https://www.nytimes.com/interactive/2020/03/21/upshot/coronavirus-deaths-by-country.html'>visualizations</a><span> </span>
-        out there depicting the unfolding COVID-19 pandemic, I thought 
-        the internet could use a more customizable, interactive
-        one. 
-        This is not intended to be the fasted-updated or most 
-        comprehensive dashboard for keeping up with the numbers. 
-        My hope is that you are able to derive your own 
-        insights from these visualizations of this data, and 
-        thereby more fully grasp the gravity of this global 
-        health crisis.
+        COVID LENS is a project that 
+        helps viewers visualize the trends in coronavirus 
+        transmission around the United States.
       </p>
       <small><FaGithub /> <a href='https://github.com/jonjonrankin/coronavirus-response'>Collaborate</a> with me on GitHub - <FaHeart /> <a href='https://github.com/jonjonrankin/'>jonjonrankin</a></small>
     </div>
