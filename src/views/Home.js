@@ -6,6 +6,7 @@ import CasesTimeSeries from '../components/Charts/CasesTimeSeries'
 import NewCasesDaily from '../components/Charts/NewCasesDaily'
 import { ordinalSuffixOf } from '../utils.js'
 import NewCasesVsTotalCases from '../components/Charts/NewCasesVsTotalCases'
+import { Link } from 'react-router-dom'
 
 const Search = (props) => {
   const [query, setQuery] = useState('')
@@ -67,7 +68,7 @@ class Home extends React.Component {
       daysToDouble: 4,
       daysSinceNthCase: 100,
       countries: [],
-      selectedCountries: ["US", "Italy", "Japan", "India", "Canada"],
+      selectedCountries: ["Brazil", "India", "Korea, South"],
       query: '',
       maxCases: null,
       windowWidth: window.innerWidth,
@@ -210,14 +211,6 @@ class Home extends React.Component {
           {this.renderControlPanel()}
         </div>
         <div className='graphs-container'>
-          {console.log('rendering graphs')}
-          <h1>The big picture</h1>
-          <p>
-            Making sense of the coronavirus numbers you hear in the media can be a challenge. 
-            COVID LENS helps you explore the data to see the trends that matter to you. 
-            These charts illustrate the how rapidly COVID-19 cases are growing in the countries you've selected in the control panel.
-          </p>
-          <br /><br />
           <h2>Growth in cases since the {ordinalSuffixOf(this.state.daysSinceNthCase)} case</h2>
           <p>
             This chart shows how rapidly the COVID-19 disease has spread since each country's {ordinalSuffixOf(this.state.daysSinceNthCase)} case. 
@@ -236,6 +229,7 @@ class Home extends React.Component {
             Accelerating growth in cases only ends when the number of new cases each day starts to stall or decrease. 
             Some countries have already made progress on this front, while others still struggle with growing daily increases.
           </p>
+          <h2 style={{marginTop: '2rem', marginBottom: '1rem'}}>New cases each day</h2>
           <div className='daily-increase-graphs'>
             {this.renderDailyIncreaseGraph()}
           </div>
@@ -246,6 +240,7 @@ class Home extends React.Component {
           <div className='new-cases-vs-total-cases-graphs'>
             {this.renderNewCasesVsTotalCases()}
           </div> */}
+          <Link to='/'>See United States data 👉</Link>
         </div>
       </div>
     )

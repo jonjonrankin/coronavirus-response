@@ -1,0 +1,32 @@
+.us-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  h1 {
+    text-align: center;
+    margin: 6rem 0 0 0;
+  }
+
+  .date-picker {
+    position: sticky;
+    top: 0;
+    width: 100%;
+    padding: 1rem;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+
+    label {
+      margin-right: 1rem;
+    }
+
+    background-color: #5b5b5b;
+
+    .range {
+      margin-left: 1rem;
+      width: 50%;
+    }
+  }
+}
